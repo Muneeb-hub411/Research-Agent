@@ -6,14 +6,18 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 load_dotenv()
 
-def get_writer_chain():
-    """LCEL chain for the Writer Agent to synthesize scraped data into an article."""
-    api_key = os.getenv("GOOGLE_API_KEY")
+def _get_gemini_api_key():
+    api_key = os.getenv("Gemini_Api_Key") or os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
     if not api_key:
-        raise ValueError("GOOGLE_API_KEY is missing from environment variables.")
+        raise ValueError("Gemini API Key is missing from environment variables.")
+    return api_key
+
+def get_writer_chain(model_name: str = "gemini-3.6-flash"):
+    """LCEL chain for the Writer Agent to synthesize scraped data into an article."""
+    api_key = _get_gemini_api_key()
 
     llm = ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash",
+        model=model_name,
         temperature=0.3,
         google_api_key=api_key
     )
@@ -30,14 +34,12 @@ def get_writer_chain():
     # LCEL pipeline
     return prompt | llm | StrOutputParser()
 
-def get_critic_chain():
+def get_critic_chain(model_name: str = "gemini-3.6-flash"):
     """LCEL chain for the Critic Agent to evaluate and score the written article."""
-    api_key = os.getenv("GOOGLE_API_KEY")
-    if not api_key:
-        raise ValueError("GOOGLE_API_KEY is missing from environment variables.")
+    api_key = _get_gemini_api_key()
 
     llm = ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash",
+        model=model_name,
         temperature=0.1,
         google_api_key=api_key
     )

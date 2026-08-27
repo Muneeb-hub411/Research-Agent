@@ -7,14 +7,14 @@ from langchain_community.tools.tavily_search import TavilySearchResults
 # Load environment variables
 load_dotenv()
 
-def get_tavily_search_tool():
+def get_tavily_search_tool(max_results: int = 3):
     """Initializes and returns the Tavily search tool."""
-    api_key = os.getenv("Tavily_Api_Key")
+    api_key = os.getenv("Tavily_Api_Key") or os.getenv("TAVILY_API_KEY")
     if not api_key:
         raise ValueError("TAVILY_API_KEY is missing from environment variables.")
         
     tavily_tool = TavilySearchResults(
-        max_results=3,
+        max_results=max_results,
         tavily_api_key=api_key
     )
     tavily_tool.name = "web_search"
